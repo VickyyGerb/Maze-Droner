@@ -20,6 +20,6 @@ def stop_drone():
     return {"status": "Dron detenido"}
 
 @app.post("/move")
-def move_drone(direction: str = Query(..., description="up, down, left, right")):
+def move_drone(direction: str = Query(..., description="up, down, , right")):
     drone.move(direction)
     return {"status": f"Movimiento {direction} ejecutado"}

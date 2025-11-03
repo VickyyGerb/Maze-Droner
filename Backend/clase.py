@@ -34,7 +34,7 @@ class DroneController:
             print("⚠️ El dron no está en vuelo. Presiona Start primero.")
             return
 
-        distance = 30  # cm
+        distance = 50  # cm
         if direction == "up":
             self.tello.move_forward(distance)
         elif direction == "down":
