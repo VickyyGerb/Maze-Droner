@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Control de Dron</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to bottom, #1f1c2c, #928dab);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        padding-top: 50px;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 40px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+      }
+
+      .start-stop {
+        margin-bottom: 30px;
+      }
+
+      .start-stop button {
+        background: #ff6b6b;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        margin: 0 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 5px #c94c4c;
+        transition: all 0.2s;
+      }
+
+      .start-stop button:active {
+        transform: translateY(4px);
+        box-shadow: 0 1px #c94c4c;
+      }
+
+      .button-grid {
+        display: grid;
+        grid-template-columns: 80px 80px 80px;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .button-grid button {
+        background: #4ecdc4;
+        border: none;
+        padding: 20px;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 5px #399b91;
+        transition: all 0.2s;
+      }
+
+      .button-grid button:active {
+        transform: translateY(4px);
+        box-shadow: 0 1px #399b91;
+      }
+
+      #status {
+        margin-top: 40px;
+        font-size: 1.5rem;
+        padding: 10px 20px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Control del Dron</h1>
+
+    <div class="start-stop">
+      <button onclick="startDrone()">Start</button>
+      <button onclick="stopDrone()">Stop</button>
+    </div>
+
+    <div class="button-grid">
+      <div></div>
+      <button onclick="moveDrone('up')">↑</button>
+      <div></div>
+      <button onclick="moveDrone('left')">←</button>
+      <div></div>
+      <button onclick="moveDrone('right')">→</button>
+      <div></div>
+      <button onclick="moveDrone('down')">↓</button>
+      <div></div>
+    </div>
+
+    <p id="status">Listo para controlar el dron</p>
+
+    <script>
+      const API_URL = "http://127.0.0.1:8000"; // Cambia el puerto si tu FastAPI está en otro
+
+      async function callDrone(endpoint, direction = null) {
+        let url = `${API_URL}/${endpoint}`;
+        if (direction) url += `?direction=${direction}`;
+        try {
+          const res = await fetch(url, { method: "POST" });
+          if (res.ok) {
+            const data = await res.json();
+            document.getElementById("status").innerText = data.status;
+          } else {
+            document.getElementById(
+              "status"
+            ).innerText = `Error: ${res.status} ${res.statusText}`;
+          }
+        } catch (err) {
+          console.log(err);
+          document.getElementById("status").innerText =
+            "⚠️ No se pudo conectar al dron";
+        }
+      }
+
+      function startDrone() {
+        callDrone("start");
+      }
+      function stopDrone() {
+        callDrone("stop");
+      }
+      function moveDrone(direction) {
+        callDrone("move", direction);
+      }
+
+      // Control con teclado opcional
+      document.addEventListener("keydown", (e) => {
+        switch (e.key) {
+          case "ArrowUp":
+            moveDrone("up");
+            break;
+          case "ArrowDown":
+            moveDrone("down");
+            break;
+          case "ArrowLeft":
+            moveDrone("left");
+            break;
+          case "ArrowRight":
+            moveDrone("right");
+            break;
+        }
+      });
+    </script>
+  </body>
+</html>
